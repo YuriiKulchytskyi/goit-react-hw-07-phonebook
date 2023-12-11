@@ -13,32 +13,25 @@ function ContactForm() {
 
     const handleSubmit = event => {
       event.preventDefault();
-
-      const contact = {
-        name: name,
-        number: number,
-      };
-
-      const isContactExist = contacts.find(
-        ({ name }) => name.toLowerCase() === contact.name.toLowerCase()
-      );
-
-      if (isContactExist) {
-        alert(`Contact with name ${contact.name} already exists!`);
+  
+      const trimmedName = name.trim();
+      const trimmedNumber = number.trim();
+  
+      if (trimmedName === '' || trimmedNumber === '') {
         return;
       }
-
-      const isNumberExist = contacts.find(
-        ({ number }) =>
-          contact.number.replace(/\D/g, '') === number.replace(/\D/g, '')
+  
+      const contactExists = contacts.some(
+        contact =>
+          contact.name === trimmedName || contact.number === trimmedNumber
       );
-
-      if (isNumberExist) {
-        alert(`Number ${contact.number} is already in contacts!`);
+  
+      if (contactExists) {
+        alert('This contact already exists.');
         return;
       }
-
-      dispatch(addContact(contact));
+  
+      dispatch(addContact(trimmedName, trimmedNumber));
       setName('');
       setNumber('');
     };
