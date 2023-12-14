@@ -3,46 +3,39 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addContact } from '../../redux/operations';
 import { Form, Input, Text, Button } from './ContactForm.styled';
 import { selectContacts } from '../../redux/selectors';
+import { nanoid } from 'nanoid';
 
 function ContactForm() {
 
-    const dispatch = useDispatch();
-    const contacts = useSelector(selectContacts);
-    const [name, setName] = useState('');
-    const [number, setNumber] = useState('');
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts)
+  const [form, setForm] = useState({name: '', number: ''} );
+const {name, number} = form;
 
-    const handleSubmit = event => {
-      event.preventDefault();
-  
-      const trimmedName = name.trim();
-      const trimmedNumber = number.trim();
-  
-      if (trimmedName === '' || trimmedNumber === '') {
-        return;
-      }
-  
-      const contactExists = contacts.some(
-        contact =>
-          contact.name === trimmedName || contact.number === trimmedNumber
-      );
-  
-      if (contactExists) {
-        alert('This contact already exists.');
-        return;
-      }
-  
-      dispatch(addContact(trimmedName, trimmedNumber));
-      setName('');
-      setNumber('');
-    };
+  const handleChange = (e) => {
+    const {name , value } = e.target;
+    setForm((prevForm) => ({ ...prevForm, [name]: value }))};
 
-    const handleNameChange = event => {
-      setName(event.target.value);
-    };
+    
+      
 
-    const handleNumberChange = event => {
-      setNumber(event.target.value);
+ const  handleSubmit = (e) => {
+    e.preventDefault();
+   
+    if (contacts.some((contact) => contact.name.toLowerCase() === form.name.toLowerCase())) {
+      alert(`${form.name} already in contacts`);
+      return;
+    }
+    const contact = {
+      name,
+      number,
+id: nanoid()
     };
+    dispatch(addContact(contact));
+   setForm({name: '', number: ''})
+  };
+
+
 
     return (
       <Form onSubmit={handleSubmit}>
@@ -52,7 +45,7 @@ function ContactForm() {
           name="name"
           required
           value={name}
-          onChange={handleNameChange}
+          onChange={handleChange}
         />
   
         <Text>Number</Text>
@@ -61,7 +54,7 @@ function ContactForm() {
           name="number"
           required
           value={number}
-          onChange={handleNumberChange}
+          onChange={handleChange}
         />
   
         <Button type="submit">Add</Button>
